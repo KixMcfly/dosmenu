@@ -1,0 +1,23 @@
+CC = gcc
+DEBUG = -Wall -g
+
+.PHONY: clean
+
+OBJECTS = main.o win.o
+
+all: setup
+
+setup: $(OBJECTS)
+	$(CC) $(DEBUG) $(OBJECTS) -o $@ -lalleg
+
+main.o: main.c main.h
+	$(CC) $(DEBUG) -c $< -o $@
+	
+
+	
+win.o: win.c win.h
+	$(CC) $(DEBUG) -c $< -o $@
+
+clean:
+	del /S *.o
+	del setup.exe
