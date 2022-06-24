@@ -7,6 +7,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "controls.h"
+#include "choice.h"
+
 /* Color settings */
 #define WIN_BACK_COLOR		BLUE
 #define WIN_TEXT_COLOR		LIGHTGRAY
@@ -32,6 +35,18 @@ enum {
 	RES_N,
 	RES_Y
 };
+
+void
+win_set_cur (int win);
+
+int
+win_get_prev (void);
+
+int
+win_get_cur (void);
+
+int
+win_attach_data (WIN *win, void *data);
 
 int
 win_process (WIN *win, int kp);

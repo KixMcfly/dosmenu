@@ -1,11 +1,11 @@
 #include "controls.h"
 
-typedef struct {
+struct KEY_ASSIGN {
 	
 	int key;
 	char *action;
 	
-} KEY_ASSIGN;
+};
 
 static const char *action_list[] = {
 		
@@ -21,32 +21,38 @@ static const int action_default[] = {
 		KEY_DOWN,
 		KEY_LEFT,
 		KEY_RIGHT
-	
 };
 
-/* Keyboard assign positions and dimentions */
-
-
+static int nk = 0;
 static KEY_ASSIGN *key_assigns = NULL;
 
-static int
-get_num_actions (void)
+const char *
+control_get_action (int k)
 {
-	int na = 0;
-	while (action_list[na])
-		na++;
+	if (k > nk - 1)
+		return NULL;
 		
-	return na;
+	return key_assigns[k].action;
+}
+
+KEY_ASSIGN *
+control_get_data (void)
+{
+	return key_assigns;
+}
+
+int
+get_num_keys (void)
+{	
+	return nk;
 }
 
 void
 free_key_assigns (void)
 {
-	int na, ca = 0;
+	int ca = 0;
 	
-	na = get_num_actions ();
-	
-	while (ca < na)
+	while (ca < nk)
 		free (key_assigns[ca++].action);
 	
 	free (key_assigns);
@@ -57,13 +63,16 @@ free_key_assigns (void)
 void
 populate_default_keys (void)
 {
-	int na = 0, ca = 0;
+	int ca = 0;
+	nk = 0;
 
-	na = get_num_actions ();
+	while (action_list[nk])
+		nk++;
 
-	key_assigns = (KEY_ASSIGN *) malloc (sizeof (KEY_ASSIGN) * na);
+
+	key_assigns = (KEY_ASSIGN *) malloc (sizeof (KEY_ASSIGN) * nk);
 		
-	for (ca = 0; ca < na; ca++){
+	for (ca = 0; ca < nk; ca++){
 		key_assigns[ca].key = action_default[ca];
 		key_assigns[ca].action = (char *) malloc (strlen (action_list[ca]) + 1);
 		strcpy (key_assigns[ca].action, action_list[ca]);

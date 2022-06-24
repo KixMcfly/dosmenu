@@ -3,7 +3,7 @@ DEBUG = -Wall -g
 
 .PHONY: clean
 
-OBJECTS = main.o win.o
+OBJECTS = main.o win.o controls.o choice.o
 
 all: setup
 
@@ -13,7 +13,11 @@ setup: $(OBJECTS)
 main.o: main.c main.h
 	$(CC) $(DEBUG) -c $< -o $@
 	
-
+controls.o: controls.c controls.h
+	$(CC) $(DEBUG) -c $< -o $@
+	
+choice.o: choice.c choice.h
+	$(CC) $(DEBUG) -c $< -o $@
 	
 win.o: win.c win.h
 	$(CC) $(DEBUG) -c $< -o $@

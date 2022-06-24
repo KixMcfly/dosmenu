@@ -13,10 +13,45 @@ struct WIN {
 	
 };
 
-int
-win_attach_data (WIN *win, char *data)
+static int cur_win = 0, prev_win = 0;
+
+void
+win_set_cur (int win)
 {
+	prev_win = cur_win;
+	cur_win = win;
+}
+
+int
+win_get_prev (void)
+{
+	return prev_win;
+}
+
+int
+win_get_cur (void)
+{
+	return cur_win;
+}
+
+int
+win_attach_data (WIN *win, void *data)
+{
+	
 	if (!win) return 0;
+		
+	win->num_lines = 0;
+	win->data = NULL;
+
+	switch (win->type){
+		case WIN_KEYS:
+			win->num_lines = get_num_keys ();
+			
+			break;
+		case WIN_CHOICE:
+			win->num_lines = choice_get_len((CHOICE *)data);
+			break;
+	}
 	
 	win->data = data;
 	
@@ -26,17 +61,27 @@ win_attach_data (WIN *win, char *data)
 int
 win_process (WIN *win, int kp)
 {
+	
+	if (kp == KEY_ESC)
+		return RES_BACK;
+	
 	switch (win->type){
 		case WIN_CHOICE:
 			if (kp == KEY_UP) win->sel--;
 			if (kp == KEY_DOWN) win->sel++;
 			
-			if (win->sel > win->num_lines) win->sel = 0;
-			if (win->sel < 0) win->sel = win->num_lines;
+			if (win->sel == win->num_lines) win->sel = 0;
+			if (win->sel < 0) win->sel = win->num_lines - 1;
+			
+			if (kp == KEY_ENTER)
+				return win->sel;
+				
 			break;
 	}
 	
-	return 1;
+	
+	
+	return RES_NOOP;
 }
 
 int
@@ -58,7 +103,7 @@ win_new (int type)
 {
 	WIN *win = NULL;
 	
-	if (type != WIN_CHOICE || type != WIN_KEYS)
+	if (type != WIN_CHOICE && type != WIN_PROMPT && type != WIN_KEYS )
 		return NULL;
 	
 	win = (WIN *)malloc (sizeof (WIN));
@@ -131,7 +176,9 @@ draw_border (int x, int y, int w, int h)
 void
 win_draw (WIN *win)
 {
-	int x, y, w, h;
+	int x, y, w, h, i;
+	CHOICE *t_choice = NULL;
+	char *t_prompt = NULL;
 	
 	x = win->x;
 	y = win->y;
@@ -151,9 +198,36 @@ win_draw (WIN *win)
 	/* Finally, draw window */
 	window (x+1, y+1, w+x-2, h+y-2);
 	clrscr ();
-	
-	if (win->type == WIN_PROMPT){
-		
-	}
 
+	switch (win->type){
+		case WIN_CHOICE:
+			t_choice = win->data;
+			for (i = 0, x = 3, y = 3; i < win->num_lines; i++, y++){
+				gotoxy (x, y);
+				if (i == win->sel) cprintf ("%c%s", 0x10, 
+					choice_get_text (t_choice, i));
+				else cprintf (" %s", choice_get_text (t_choice, i));
+			}
+			break;
+		case WIN_KEYS:
+
+			for (i = 0, x = 3, y = 3; i < win->num_lines; i++, y++){
+				gotoxy (x, y);
+				if (i == win->sel)
+					cprintf ("%c%s", 0x10, control_get_action (i));
+				else
+					cprintf (" %s", control_get_action (i));
+			}
+			
+			break;
+		case WIN_PROMPT:
+			t_prompt = win->data;
+			x = 3;
+			y = 1;
+			gotoxy (x, y);
+			cprintf ("%s", t_prompt);
+			gotoxy (x+4, y+2);
+			cprintf ("Y/N");
+			break;
+	}
 }

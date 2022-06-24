@@ -8,6 +8,7 @@
 
 #include "win.h"
 #include "controls.h"
+#include "choice.h"
 
 /* Available windows */
 #define WIN_MAIN			0
@@ -28,7 +29,7 @@
 #define WIN_KEYS_X			16
 #define WIN_KEYS_Y			6
 #define WIN_KEYS_W			50
-#define WIN_KEYS_H			13
+#define WIN_KEYS_H			18
 
 #define WIN_QUIT_X			16
 #define WIN_QUIT_Y			6
