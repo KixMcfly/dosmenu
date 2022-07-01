@@ -35,6 +35,24 @@ control_get_action (int k)
 	return key_assigns[k].action;
 }
 
+int
+control_get_key (int k)
+{
+	if (k > nk - 1)
+		return NULL;
+	
+	return key_assigns[k].key;
+}
+
+void
+control_set_key (int an, int k)
+{
+	if (an > nk - 1)
+		return;
+		
+	key_assigns[an].key = k;
+}
+
 KEY_ASSIGN *
 control_get_data (void)
 {

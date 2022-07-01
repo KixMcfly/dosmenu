@@ -18,6 +18,13 @@
 #define SCR_W				80
 #define SCR_H				25
 
+/* Window responses */
+#define RES_NOOP			0xFFFF0000
+#define RES_QUIT			0xFFFF0001
+#define	RES_BACK			0xFFFF0002
+#define	RES_N				0xFFFF0003
+#define RES_Y				0xFFFF0004
+
 typedef struct WIN WIN;
 
 /* Window types */
@@ -27,14 +34,8 @@ enum {
 	WIN_PROMPT
 };
 
-/* Window responses */
-enum {
-	RES_NOOP,
-	RES_QUIT,
-	RES_BACK,
-	RES_N,
-	RES_Y
-};
+unsigned int
+win_get_sel (WIN *win);
 
 void
 win_set_cur (int win);

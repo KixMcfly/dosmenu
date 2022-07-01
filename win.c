@@ -15,6 +15,16 @@ struct WIN {
 
 static int cur_win = 0, prev_win = 0;
 
+unsigned int
+win_get_sel (WIN *win)
+{
+	
+	if (!win)
+		return 0xFFFFFFFF;
+		
+	return win->sel;
+}
+
 void
 win_set_cur (int win)
 {
@@ -25,6 +35,9 @@ win_set_cur (int win)
 int
 win_get_prev (void)
 {
+	if (!cur_win)
+		return 0;
+	
 	return prev_win;
 }
 
@@ -67,18 +80,19 @@ win_process (WIN *win, int kp)
 	
 	switch (win->type){
 		case WIN_CHOICE:
+		case WIN_KEYS:
+
+			if (kp == KEY_ENTER)
+				return win->sel;
+		
 			if (kp == KEY_UP) win->sel--;
 			if (kp == KEY_DOWN) win->sel++;
 			
 			if (win->sel == win->num_lines) win->sel = 0;
 			if (win->sel < 0) win->sel = win->num_lines - 1;
 			
-			if (kp == KEY_ENTER)
-				return win->sel;
-				
 			break;
 	}
-	
 	
 	
 	return RES_NOOP;
@@ -93,7 +107,7 @@ win_set_xywh (WIN *win, int x, int y, int w, int h)
 	win->x = x;
 	win->y = y;
 	win->w = w;
-	win->h = y;
+	win->h = h;
 	
 	return 1;
 }
@@ -210,13 +224,20 @@ win_draw (WIN *win)
 			}
 			break;
 		case WIN_KEYS:
-
+			
 			for (i = 0, x = 3, y = 3; i < win->num_lines; i++, y++){
 				gotoxy (x, y);
-				if (i == win->sel)
+				t_prompt = (char *)scancode_to_name (control_get_key (i));
+				if (i == win->sel){
 					cprintf ("%c%s", 0x10, control_get_action (i));
-				else
+					gotoxy (win->w - strlen (t_prompt) - x, y);
+					cprintf ("%s", t_prompt);
+					
+				}else{
 					cprintf (" %s", control_get_action (i));
+					gotoxy (win->w - strlen (t_prompt) - x, y);
+					cprintf ("%s", t_prompt);
+				}
 			}
 			
 			break;

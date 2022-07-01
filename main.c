@@ -3,7 +3,7 @@
 int
 main (void)
 {
-	int quit = FALSE, res = RES_NOOP, kp = 0;
+	int quit = FALSE, res = RES_NOOP, kp = 0, edit_key = FALSE;
 	WIN *win_main, *win_keys, *win_quit;
 	CHOICE *choice_main;
 
@@ -79,8 +79,13 @@ main (void)
 				break;
 			case WIN_KEYS:
 				
+				
 				res = win_process (win_keys, kp);
 				
+				if (res == RES_BACK)
+					win_set_cur (win_get_prev ());
+			
+
 				break;
 			case WIN_QUIT:
 		
@@ -91,8 +96,8 @@ main (void)
 				break;
 		}
 		
-		if (res == RES_BACK)
-			win_set_cur (win_get_prev ());
+		
+		
 	}
 	
 	choice_free (choice_main);
